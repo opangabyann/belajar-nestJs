@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import BaseResponse from 'src/utils/response/base.response';
 import { Kategori } from './kategori.entity';
 import {
+  CreateKategorArrayDto,
   CreateKategoriDto,
   UpdateKategoriDto,
   findAllKategori,
@@ -96,7 +97,7 @@ export class KategoriService extends BaseResponse {
     });
     if (!check)
       throw new NotFoundException(`Kategori dengan id ${id} tidak ditemukan`);
-    const update = await this.kategoriRepository.save(payload);
+    const update = await this.kategoriRepository.save({ ...payload, id: id });
     return {
       status: `Success `,
       message: 'Kategori berhasil di update',
@@ -119,5 +120,39 @@ export class KategoriService extends BaseResponse {
       status: `Success `,
       message: 'Berhasil menghapus buku',
     };
+  }
+
+  async createBulk(payload: CreateKategorArrayDto): Promise<ResponseSuccess> {
+    try {
+      let berhasil = 0;
+      let gagal = 0;
+      await Promise.all(
+        payload.data.map(async (data) => {
+          const dataSave = {
+            ...data,
+            kategori: {
+              id: data.nama_kategori,
+            },
+            created_by: {
+              id: this.req.user.id,
+            },
+          };
+
+          try {
+            await this.kategoriRepository.save(dataSave);
+
+            berhasil += 1;
+          } catch (err) {
+            console.log('err', err);
+            gagal += 1;
+          }
+        }),
+      );
+
+      return this._success(`Berhasil menyimpan ${berhasil} dan gagal ${gagal}`);
+    } catch (err) {
+      console.log('err', err);
+      throw new HttpException('Ada Kesalahan', HttpStatus.BAD_REQUEST);
+    }
   }
 }

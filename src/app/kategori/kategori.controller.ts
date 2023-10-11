@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { KategoriService } from './kategori.service';
 import {
+  CreateKategorArrayDto,
   CreateKategoriDto,
   UpdateKategoriDto,
   findAllKategori,
@@ -28,6 +29,11 @@ export class KategoriController {
   @Post('create')
   async create(@InjectCreatedBy() payload: CreateKategoriDto) {
     return this.kategoriService.create(payload);
+  }
+
+  @Post('create-bulk')
+  async createBulk(@Body() payload: CreateKategorArrayDto) {
+    return this.kategoriService.createBulk(payload);
   }
 
   @Get('list')
