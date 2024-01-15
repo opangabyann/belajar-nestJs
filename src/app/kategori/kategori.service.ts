@@ -52,11 +52,15 @@ export class KategoriService extends BaseResponse {
     });
     const result = await this.kategoriRepository.find({
       where: filterQuery,
-      relations: ['created_by', 'updated_by'], // relasi yang aka ditampilkan saat menampilkan list kategori
+      relations: ['created_by', 'updated_by', 'produk'], // relasi yang aka ditampilkan saat menampilkan list kategori
       select: {
         // pilih data mana saja yang akan ditampilkan dari tabel kategori
         id: true,
         nama_kategori: true,
+        produk: {
+          id: true,
+          nama_produk: true,
+        },
         created_by: {
           id: true, // pilih field  yang akan ditampilkan dari tabel user
           nama: true,
@@ -106,7 +110,7 @@ export class KategoriService extends BaseResponse {
   }
 
   async deleteKategori(id: number): Promise<ResponseSuccess> {
-    const check = await this.kategoriRepository.find({
+    const check = await this.kategoriRepository.findOne({
       where: {
         id,
       },

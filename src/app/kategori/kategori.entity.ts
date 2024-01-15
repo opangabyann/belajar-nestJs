@@ -4,9 +4,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../auth/auth.entity';
+import { Produk } from '../produk/produk.entity';
 
 @Entity()
 export class Kategori extends BaseEntity {
@@ -19,6 +21,9 @@ export class Kategori extends BaseEntity {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'created_by' }) //buat relasi many to one  dengan table user
   created_by: User;
+
+  @OneToMany(() => Produk, (v) => v.kategori)
+  produk: Produk[];
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'updated_by' }) //buat relasi many to one  dengan table user
